@@ -1,5 +1,5 @@
 import styles from './page.module.scss'
-import logoImg from '/public/logo.svg'
+import logoImg from '/public/logoG.svg'
 import Image from 'next/image'
 import Link from 'next/link'
 
