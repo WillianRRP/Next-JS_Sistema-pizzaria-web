@@ -2,8 +2,47 @@ import styles from './page.module.scss'
 import logoImg from '/public/logoG.svg'
 import Image from 'next/image'
 import Link from 'next/link'
+import{ api } from '@/services/api'
+import { redirect } from 'next/navigation'
+import e from 'express'
 
 export default function Page(){
+
+  async function handleLogin(formData: FormData){
+
+    'use server'
+    const email = formData.get('email')
+    const password = formData.get('password')
+
+    if(email === '' || password === ''){
+      console.log("preencher todos os campos");
+      return;
+    }
+    try{
+
+      const response = await api.post('/session',{
+        email,
+        password
+      })
+
+      if(!response.data.token){
+        return;
+        
+
+      }
+
+      console.log(response.data);
+
+    }catch(err){
+      console.log(err);
+      return;
+    }
+    redirect('/dashboard')
+
+
+  }
+
+
   return(
     <>
      <div className={styles.containerCenter}>
@@ -17,7 +56,7 @@ export default function Page(){
 
         <section className={styles.login}>
         
-          <form>
+          <form action={handleLogin}>
             <input 
               type="email"
               required
