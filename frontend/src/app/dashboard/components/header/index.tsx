@@ -6,13 +6,17 @@ import Image from 'next/image';
 import { LogOutIcon } from 'lucide-react';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
+import{ toast } from 'sonner'
+
+
 
 export function Header() {
   const router = useRouter();
 
   async function handleLogout() {
     deleteCookie('session', { path: '/' });
-    router.replace('/login');
+    toast.success('Logout realizado com sucesso!')
+    router.replace('/');
   }
 
   return (
@@ -30,7 +34,6 @@ export function Header() {
           />
         </Link>
 
-        {/* NAVEGAÇÃO */}
         <nav>
           <Link href="/dashboard/category">Categoria</Link>
           <Link href="/dashboard/products">Produtos</Link>

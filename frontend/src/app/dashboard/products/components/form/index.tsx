@@ -5,10 +5,63 @@ import styles from './styles.module.scss';
 import { UploadCloud } from 'lucide-react'
 import Image from 'next/image';
 import { Button } from '@/app/dashboard/components/button';
+import { api } from '@/services/api';
+import { getCookieClient } from '@/lib/cookieClient';
+import{ toast } from 'sonner'
+import { useRouter } from 'next/navigation';
+interface CategoryProps{
+   id: string;
+    name: string;
+}
+interface Props{
+    categories:CategoryProps[]
+}
 
-export function Form() {
-    const [image, setImage] = useState<File>()
+export function Form({categories}: Props) {
+    const router = useRouter();
+    const [image, setImage] = useState<File>();
     const[previewImage, setPreviewImage] = useState('')
+
+    async function handleRegisterProduct(formData: FormData) {
+        const categoryIndex = formData.get('category')
+        const name = formData.get('name')
+        const price = formData.get('price')
+        const description = formData.get('description')
+
+        if(!name||!categoryIndex || !price || !description || !image) {
+            toast.warning('Preencha todos os campos!')
+            
+            return;
+
+
+        }
+
+        const data = new FormData()
+
+        data.append('name',name)
+        data.append('price',price)
+        data.append('description',description)
+        data.append('category_id',categories[Number(categoryIndex)].id)
+        data.append('file', image)
+
+        const token = getCookieClient()
+        await api.post('/product', data, {
+            headers:{
+                Authorization: `Bearer ${token}`,
+            }
+        })
+        .catch((err) =>{
+            console.log(err);
+            toast.warning('Erro ao cadastrar produto!')
+            return;
+        })
+
+        
+        toast.success('Produto cadastrado com sucesso!')
+        router.push('/dashboard')
+    }
+
+
 
 
     function handleFile(e: ChangeEvent<HTMLInputElement>) {
@@ -19,7 +72,7 @@ export function Form() {
 
 
             if(image.type !== 'image/png' && image.type !== 'image/png') {
-            console.log('Formato de imagem inválido')
+            toast.error('Formato não permitido!')
             return
         }
 
@@ -35,7 +88,7 @@ export function Form() {
 
             <h1>Novo Produto</h1>
 
-            <form className={styles.form}>
+            <form className={styles.form} action={handleRegisterProduct}>
 
                 <label className={styles.labelImage}>
                     <span>
@@ -59,12 +112,11 @@ export function Form() {
                     )}
                 </label>
                 <select name='category'>
-                    <option key={1} value={1}>
-                        Pizzas
-                    </option>
-                    <option key={1} value={1}>
-                        Massas
-                    </option>
+                    {categories.map((Category, index) =>(
+                        <option key={Category.id} value={index}>
+                            {Category.name}
+                        </option>
+                    ))}
                 </select>
 
                 <input type='text'
