@@ -1,7 +1,7 @@
 import { Orders } from "./components/orders";
 import { api } from "@/services/api";
 import { getCookieServer } from "@/lib/cookieServer";
-import { OrderProps } from "@/lib/orders.type";
+import { OrderProps } from "@/lib/order.type";
 
 
 async function getOrders(): Promise<OrderProps[] | []> {
@@ -25,10 +25,10 @@ async function getOrders(): Promise<OrderProps[] | []> {
 }
 export default async function Dashboard(){
     const orders =  await getOrders();
-    console.log(orders)
+
     return (
         <>
-      <Orders/>
+      <Orders orders={orders}/>
         </>
     )
 }
